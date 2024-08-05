@@ -21,7 +21,7 @@ pub fn to_latin_text(text: &str, rm_spaces: bool) -> String {
 
     // replacing non-latin symbols into dash "-":
     let text = Regex::new(&format!(r"[^A-Za-z0-9\-\_{}]+", if !rm_spaces { r"\s" }else{ "" })).unwrap()
-        .replace_all(text.trim(), "_");
+        .replace_all(text.trim(), "-");
     
     // removing underscores && dashes from the start && end of string:
     let text = Regex::new(r"(^[_\-]+|[_\-]+$)+").unwrap()

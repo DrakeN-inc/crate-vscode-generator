@@ -10,8 +10,6 @@ pub struct Package {
     id: String,
     #[serde(rename = "displayName")]
     name: String,
-    #[serde(skip_serializing)]
-    title: String,
     description: String,
     version: Version,
     categories: Vec<Category>,
@@ -39,13 +37,12 @@ impl Package {
     /// * icon - the package icon image
     /// * repository - the package repository URL
     /// * license - the package license
-    pub fn snippets<S, R>(id: S, name: S, title: S, description: S, version: Version, icon: S, repository: Option<R>, snippets: Vec<Snippets>, license: License) -> Self
+    pub fn snippets<S, R>(id: S, name: S, description: S, version: Version, icon: S, repository: Option<R>, snippets: Vec<Snippets>, license: License) -> Self
     where S: Into<String>, R: Into<Repository>
     {
         let mut this = Self {
             id: id.into(),
             name: name.into(),
-            title: title.into(),
             description: description.into(),
             version,
             categories: vec![Category::Snippets],
@@ -88,7 +85,7 @@ impl Package {
         // dbg!(&pkg_path);    // DEBUG: The package manifest path
 
         // generating a README file:
-        let mut readme = Readme::new(&self.title, &self.description);
+        let mut readme = Readme::new(&self.name, &self.description);
         
         // writing package manifest file "package.json":
         let json_cnts = self.to_json()?;

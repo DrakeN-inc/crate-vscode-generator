@@ -31,16 +31,16 @@ impl Snippets {
         let lang = language.into();
         let name = name.into();
         let descr = description.into();
-        let path = format!("snippets/{name}.code-snippets").into();
+        let path = format!("snippets/{}.code-snippets", to_latin_text(&name.to_lowercase(), true)).into();
 
         // creating the 'Snippets' object:
         let mut this = Self {
             language: lang.clone(),
-            name: name.clone(),
+            name: to_latin_text(&name, true),
             description: descr.clone(),
             path,
             snippets: HashMap::new(),
-            documentation: SnippetsDoc::new(lang, format!("The {name} snippets"), descr)
+            documentation: SnippetsDoc::new(lang, name, descr)
         };
 
         // Adding the snippets:

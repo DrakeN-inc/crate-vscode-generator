@@ -56,7 +56,7 @@ impl SnippetsDoc {
 
         // generating the base of table:
         let mut doc = format!(
-            "# {title} (for '_{lang}_' programming language):\n## {descr}\n| Prefix:{l_spaces} | Description:{r_spaces} |\n| {l_dashes} | {r_dashes} |\n",
+            "# {title} [{lang}]:\n## {descr}\n| Prefix:{l_spaces} | Description:{r_spaces} |\n| {l_dashes} | {r_dashes} |\n",
             lang = &self.language,
             title = &self.title,
             descr = &self.description,
