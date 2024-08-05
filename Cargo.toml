@@ -1,10 +1,11 @@
 [package]
 name = "vscode-generator"
+description = "The Visual Studio Code package generator [BETA]"
 version = "0.1.0"
 edition = "2021"
-
-[features]
-rust = []
+authors = ["DrakeN-inc <t.me/DrakeN_inc>"]
+license = "MIT"
+repository = "https://github.com/DrakeN-inc/crate-add-macro"
 
 [dependencies]
 chrono = "0.4.38"
