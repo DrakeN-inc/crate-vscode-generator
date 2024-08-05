@@ -1,6 +1,7 @@
 extern crate vscode_generator;
 use vscode_generator::{ prelude::* , Package, Snippets, Snippet, License };
 
+#[test]
 fn main() -> Result<()> {
     // generating package:
     let pkg = Package::snippets(
@@ -18,6 +19,12 @@ fn main() -> Result<()> {
                 "The simple text snippets",
                 vec![
                     Snippet::text("print-hello", "hello", r#"println!("Hello, world!");  // TEMP:"#),
+                    Snippet::text("comment-todo", "/todo", r#"// TODO: ${1:...}"#)
+                        .set_descr("// TODO: ..."),
+                    Snippet::text("comment-note", "/note", r#"// NOTE: ${1:...}"#)
+                        .set_descr("// NOTE: ..."),
+                    Snippet::text("comment-debug", "/debug", r#"// DEBUG: ${1:...}"#)
+                        .set_descr("// DEBUG: ..."),
                 ]
             ),
 
