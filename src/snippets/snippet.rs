@@ -82,9 +82,34 @@ impl Snippet {
         self.body.clear();
         self
     }
+
+    /// Replaces a line in body contents by index (if index is not found, then nothing will happen)
+    /// * index - the replacement line index
+    /// * text - the new text of line
+    pub fn replace_line<S>(mut self, index: usize, text: S) -> Self
+    where S: Into<String> {
+        if self.body.len() >= index {
+            self.body[index] = text.into();
+        }
+        self
+    }
+
+    /// Removes a line in body contents by index (if index is not found, then nothing will happen)
+    /// * index - the replacement line index
+    pub fn remove_line(mut self, index: usize) -> Self {
+        if self.body.len() >= index {
+            self.body.remove(index);
+        }
+        self
+    }
 }
 
 impl Snippet {
+    /// Creates a new snippet object
+    pub fn new() -> Self {
+        todo!("Fn ::new()");   // TODO: Fn ::new()
+    }
+    
     /// Creates a new simple text snippet
     /// * snippet_name - the snippet name id
     /// * prefix - the snippet prefix
@@ -104,6 +129,16 @@ impl Snippet {
             ]
         }
     }
+    
+    /// Creates a new comment snippet
+    pub fn comment() -> Self {
+        todo!("Comment snippet..");  // TODO: Comment snippet..
+    }
+
+    /// Creates a new attribute snippet
+    pub fn attribute() -> Self {
+        todo!("Attribute snippet..");  // TODO: Attribute snippet..
+    }
 
     /// Creates a new block snippet
     /// * snippet_name - the snippet name id
@@ -119,7 +154,7 @@ impl Snippet {
             description: format!("{name} ... {}", "{ ... }"),
             prefix: name.clone() + " {}",
             body: vec![
-                format!("{name} $1 {}", "\n{    $2\n}")
+                format!("{name} $1 {}", "{\n    $2\n}")
             ]
         }
     }
@@ -142,7 +177,7 @@ impl Snippet {
             body: vec![
                 format!("{name1} $1 {}", "{\n    $2\n}"),
                 "".to_owned(),
-                format!("{name2} $1 {0}", "{\n    $2\n}")
+                format!("{name2} $1 {0}", "{\n    $3\n}")
             ]
         }
     }
@@ -177,10 +212,10 @@ impl Snippet {
         Self {
             language: "".into(),
             name: snippet_name.into(),
-            description: format!("{name} (){}", "{ ... }"),
+            description: format!("{name} ...() {}", "{ ... }"),
             prefix: name.clone() + "() {}",
             body: vec![
-                format!("{name} $1($2){}", "{\n    $3\n}"),
+                format!("{name} $1($2) {}", "{\n    $3\n}"),
             ]
         }
     }
@@ -224,7 +259,7 @@ impl Snippet {
             ]
         }
     }
-
+    
     /// Converts the snippet to JSON string
     pub fn to_json(&self) -> Result<String> {
         serde_json::to_string_pretty(&self).map_err(Error::from)

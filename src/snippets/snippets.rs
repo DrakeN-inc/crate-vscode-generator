@@ -6,7 +6,7 @@ use std::{fs, path::PathBuf};
 /// * language - the programming language name
 /// * name - the snippets group name
 /// * description - the snippets group description
-/// * path - the path to snippets file
+/// * path - the snippets file path
 /// * snippets - the snippets hash map, where <SNIPPET_NAME, SNIPPET>
 /// * documentation - the snippets group [documentation](SnippetsDoc) generator
 #[derive(Debug, Clone)]
@@ -51,6 +51,38 @@ impl Snippets {
         this
     }
 
+    /// Sets the snippets programming language name
+    /// * lang - the programming language name
+    pub fn set_lang<S>(mut self, lang: S) -> Self
+    where S: Into<String> {
+        self.language = lang.into();
+        self
+    }
+
+    /// Sets the snippets group name
+    /// * name - the snippets group name
+    pub fn set_name<S>(mut self, name: S) -> Self
+    where S: Into<String> {
+        self.name = name.into();
+        self
+    }
+
+    /// Sets the snippets group description
+    /// * descr - the snippets group description
+    pub fn set_descr<S>(mut self, descr: S) -> Self
+    where S: Into<String> {
+        self.description = descr.into();
+        self
+    }
+
+    /// Sets the snippets group file name
+    /// * path - the snippets group file name
+    pub fn set_path<P>(mut self, path: P) -> Self
+    where P: Into<PathBuf> {
+        self.path = path.into();
+        self
+    }
+
     /// Adds a new snippet
     pub fn add_snippet(&mut self, snippet: Snippet) {
         // write snippet info to documentation:
@@ -76,24 +108,21 @@ impl Snippets {
         serde_json::to_string_pretty(&snippets).map_err(Error::from)
     }
     
-    /// Writes the snippets group to file "%DIR/snippets/%SNIPPET_GROUP_NAME.code-snippets"
+    /// Writes the snippets group to file "%DIR/snippets/%FILE_NAME.code-snippets"
     /// * dir - the package root directory path (without '/snippets' folder)
     pub fn write_to<P>(&self, dir: P) -> Result<&SnippetsDoc>
     where P: Into<PathBuf>
     {
         // creating dir path:
-        let dir = dir.into();
+        let dir = dir.into().join("snippets");
         // dbg!(&dir);  // DEBUG:
         fs::create_dir_all(&dir).map_err(Error::from)?;
 
-        // generating file path:
-        let path = dir.join(&self.path);
-        // dbg!(&path);  // DEBUG:
-        
         // converting snippets to JSON string:
         let json_contents = self.to_json()?;
+
         // writing snippets to file:
-        fs::write(path, json_contents).map_err(Error::from)?;
+        fs::write(&self.path, json_contents).map_err(Error::from)?;
         
         Ok(&self.documentation)
     }
