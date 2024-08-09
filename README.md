@@ -21,12 +21,36 @@ fn main() -> Result<()> {
                 "The simple text snippets",
                 vec![
                     Snippet::text("print-hello", "hello", r#"println!("Hello, world!");  // TEMP:"#),
-                    Snippet::text("comment-todo", "/todo", r#"// TODO: ${1:...}"#)
-                        .set_descr("// TODO: ..."),
-                    Snippet::text("comment-note", "/note", r#"// NOTE: ${1:...}"#)
-                        .set_descr("// NOTE: ..."),
-                    Snippet::text("comment-debug", "/debug", r#"// DEBUG: ${1:...}"#)
-                        .set_descr("// DEBUG: ..."),
+                    Snippet::comment("comment-todo", "TODO"),
+                    Snippet::comment("comment-note", "NOTE"),
+                    Snippet::comment("comment-debug", "DEBUG"),
+                    Snippet::comment("comment-fixme", "FIXME"),
+                ]
+            ),
+
+            // ATTRIBUTES SNIPPETS:
+            Snippets::new(
+                "rust",
+                "Attributes",
+                "The attributes snippets",
+                vec![
+                    Snippet::attribute("attr-derive", "derive", Some(vec![
+                        "Debug",
+                        "Display",
+                        "Clone",
+                        "Copy",
+                        "Eq\\, PartialEq",
+                        "Serialize\\, Deserialize",
+                    ])),
+
+                    Snippet::attribute("attr-allow", "allow", Some(vec![
+                        "dead_code",
+                        "unused_variables",
+                        "non_snake_case",
+                    ])),
+
+                    Snippet::attribute("attr-cfg", "cfg", Some(vec![""])),
+                    Snippet::attribute("attr-test", "test", None),
                 ]
             ),
 
