@@ -64,7 +64,7 @@ impl Package {
     /// Adds a new snippets group to package
     pub fn add_snippets_group(&mut self, snips: Snippets) {
         if let Some(snippets) = self.snippets.as_mut() {
-            self.contributes.reg_snippets(SnippetsContribute::new(snips.language.clone(), snips.path.clone()));
+            self.contributes.reg_snippets(SnippetsContribute::new(snips.language.clone(), &snips.file_name.clone()));
             snippets.push(snips);
         }
     }

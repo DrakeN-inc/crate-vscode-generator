@@ -23,6 +23,8 @@ impl Contributes {
 
 
 /// The snippets contribute object
+/// * language - the snippets programming language
+/// * path - the snippets file path
 #[derive(Debug, Clone, Serialize)]
 pub struct SnippetsContribute {
     pub language: String,
@@ -32,13 +34,14 @@ pub struct SnippetsContribute {
 impl SnippetsContribute {
     /// Creates a new snippets contributes object
     /// * lang - the snippets programming language
-    /// * path - the path to the snippets file
-    pub fn new<S, R>(lang: S, path: R) -> Self
-    where S: Into<String>, R: Into<PathBuf>
-    {
+    /// * file_name - the file_name to the snippets file
+    pub fn new<S, P>(lang: S, file_name: P) -> Self
+    where S: Into<String>, P: Into<PathBuf> {
+        let path = PathBuf::from("snippets").join( &file_name.into() );
+        
         Self {
             language: lang.into(),
-            path: path.into(),
+            path,
         }
     }
 }

@@ -6,7 +6,7 @@ use std::{fs, path::PathBuf};
 /// * language - the programming language name
 /// * name - the snippets group name
 /// * description - the snippets group description
-/// * path - the snippets file path
+/// * file_name - the snippets file name
 /// * snippets - the snippets hash map, where <SNIPPET_NAME, SNIPPET>
 /// * documentation - the snippets group [documentation](SnippetsDoc) generator
 #[derive(Debug, Clone)]
@@ -14,7 +14,7 @@ pub struct Snippets {
     pub language: String,
     pub name: String,
     pub description: String,
-    pub path: PathBuf,
+    pub file_name: PathBuf,
     snippets: HashMap<String, Snippet>,
     documentation: SnippetsDoc,
 }
@@ -31,14 +31,14 @@ impl Snippets {
         let lang = language.into();
         let name = name.into();
         let descr = description.into();
-        let path = format!("snippets/{}.code-snippets", to_latin_text(&name.to_lowercase(), true)).into();
+        let file_name = format!("{}.code-snippets", to_latin_text(&name.to_lowercase(), true)).into();
 
         // creating the 'Snippets' object:
         let mut this = Self {
             language: lang.clone(),
             name: to_latin_text(&name, true),
             description: descr.clone(),
-            path,
+            file_name,
             snippets: HashMap::new(),
             documentation: SnippetsDoc::new(lang, name, descr)
         };
@@ -76,10 +76,10 @@ impl Snippets {
     }
 
     /// Sets the snippets group file name
-    /// * path - the snippets group file name
-    pub fn set_path<P>(mut self, path: P) -> Self
+    /// * file_name - the snippets group file name
+    pub fn set_file_name<P>(mut self, file_name: P) -> Self
     where P: Into<PathBuf> {
-        self.path = path.into();
+        self.file_name = file_name.into();
         self
     }
 
@@ -122,7 +122,8 @@ impl Snippets {
         let json_contents = self.to_json()?;
 
         // writing snippets to file:
-        fs::write(&self.path, json_contents).map_err(Error::from)?;
+        let path = dir.join(&self.file_name);
+        fs::write(path, json_contents).map_err(Error::from)?;
         
         Ok(&self.documentation)
     }

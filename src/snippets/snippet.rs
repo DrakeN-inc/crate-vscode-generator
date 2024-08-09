@@ -106,22 +106,35 @@ impl Snippet {
 
 impl Snippet {
     /// Creates a new snippet object
-    pub fn new() -> Self {
-        todo!("Fn ::new()");   // TODO: Fn ::new()
+    /// * name - the snippet name id
+    /// * descr - the snippet description
+    /// * prefix - the snippet prefix
+    /// * body - the body of snippet
+    pub fn new<S>(name: S, descr: S, prefix: S, body: Vec<S>) -> Self
+    where S: Into<String> {
+        Self {
+            language: "".into(),
+            name: name.into(),
+            description: descr.into(),
+            prefix: prefix.into(),
+            body: body
+                .into_iter()
+                .map(|s| s.into())
+                .collect::<Vec<_>>()
+        }
     }
     
     /// Creates a new simple text snippet
-    /// * snippet_name - the snippet name id
+    /// * name - the snippet name id
     /// * prefix - the snippet prefix
     /// * value - the snippet body value
-    pub fn text<S>(snippet_name: S, prefix: S, value: S) -> Self
-    where S: Into<String>
-    {
+    pub fn text<S>(name: S, prefix: S, value: S) -> Self
+    where S: Into<String> {
         let value = value.into();
         
         Self {
             language: "".into(),
-            name: snippet_name.into(),
+            name: name.into(),
             description: value.clone(),
             prefix: prefix.into(),
             body: vec![
@@ -131,131 +144,134 @@ impl Snippet {
     }
     
     /// Creates a new comment snippet
-    pub fn comment() -> Self {
-        todo!("Comment snippet..");  // TODO: Comment snippet..
+    /// * name - the snippet name id
+    /// * cmnt_name - the comment name
+    pub fn comment<S>(name: S, cmnt_name: &str) -> Self
+    where S: Into<String> {
+        Self {
+            language: "".into(),
+            name: name.into(),
+            description: format!("// {cmnt_name}: ..."),
+            prefix: format!("{cmnt_name}"),
+            body: vec![
+                format!("// {cmnt_name}: {}", "${1:...}")
+            ]
+        }
     }
 
-    /// Creates a new attribute snippet
-    pub fn attribute() -> Self {
-        todo!("Attribute snippet..");  // TODO: Attribute snippet..
+    /// Creates a new attribute snippet (for Rust lang)
+    /// * name - the snippet name
+    /// * attr_name - the attiribute name
+    pub fn attribute<S>(name: S, attr_name: &str, values: Option<Vec<&str>>) -> Self
+    where S: Into<String> {
+        Self {
+            language: "".into(),
+            name: name.into(),
+            description: format!("#[{attr_name}{}]", if values.is_some(){ "(...)" }else{ "" }),
+            prefix: format!("#[{attr_name}]"),
+            body: vec![
+                format!("#[{attr_name}{}]", if let Some(values) = values{ "(${1|".to_owned() + &values.join(",") + "|})" }else{ "".into() })
+            ]
+        }
     }
 
     /// Creates a new block snippet
-    /// * snippet_name - the snippet name id
-    /// * name - the block name
-    pub fn block<S>(snippet_name: S, name: S) -> Self
-    where S: Into<String>
-    {
-        let name = name.into();
+    /// * name - the snippet name id
+    /// * block_name - the block name
+    pub fn block<S>(name: S, block_name: S) -> Self
+    where S: Into<String> {
+        let block_name = block_name.into();
         
         Self {
             language: "".into(),
-            name: snippet_name.into(),
-            description: format!("{name} ... {}", "{ ... }"),
-            prefix: name.clone() + " {}",
+            name: name.into(),
+            description: format!("{block_name} ... {}", "{ ... }"),
+            prefix: block_name.clone() + " {}",
             body: vec![
-                format!("{name} $1 {}", "{\n    $2\n}")
+                format!("{block_name} $1 {}", "{\n    $2\n}")
             ]
         }
     }
 
     /// Creates a new double block snippet
-    /// * snippet_name - the snippet name id
-    /// * name1 - the first block name
-    /// * name2 - the other block name
-    pub fn double_block<S>(snippet_name: S, name1: S, name2: S) -> Self
-    where S: Into<String>
-    {
-        let name1 = name1.into();
-        let name2 = name2.into();
-        
+    /// * name - the snippet name id
+    /// * first_block_name - the first block name
+    /// * other_block_name - the other block name
+    pub fn double_block<S>(name: S, first_block_name: &str, other_block_name: &str) -> Self
+    where S: Into<String> {
         Self {
             language: "".into(),
-            name: snippet_name.into(),
-            description: format!("{name1} ... {}  {name2} ... {0}", "{ ... }"),
-            prefix: name1.clone() + " {}" + " " + &name2 + " {}",
+            name: name.into(),
+            description: format!("{first_block_name} ... {}  {other_block_name} ... {0}", "{ ... }"),
+            prefix: first_block_name.to_owned() + " {}" + " " + &other_block_name + " {}",
             body: vec![
-                format!("{name1} $1 {}", "{\n    $2\n}"),
+                format!("{first_block_name} $1 {}", "{\n    $2\n}"),
                 "".to_owned(),
-                format!("{name2} $1 {0}", "{\n    $3\n}")
+                format!("{other_block_name} $1 {0}", "{\n    $3\n}")
             ]
         }
     }
 
     /// Creates a new simple block snippet without arguments
-    /// * snippet_name - the snippet name id
-    /// * name - the block name
-    pub fn simple_block<S>(snippet_name: S, name: S) -> Self
-    where S: Into<String>
-    {
-        let name = name.into();
-        
+    /// * name - the snippet name id
+    /// * block_name - the block name
+    pub fn simple_block<S>(name: S, block_name: &str) -> Self
+    where S: Into<String> {
         Self {
             language: "".into(),
-            name: snippet_name.into(),
-            description: format!("{name} {}", "{ ... }"),
-            prefix: name.clone() + " {}",
+            name: name.into(),
+            description: format!("{block_name} {}", "{ ... }"),
+            prefix: block_name.to_owned() + " {}",
             body: vec![
-                format!("{name} {}", "{\n    $1\n}"),
+                format!("{block_name} {}", "{\n    $1\n}"),
             ]
         }
     }
 
     /// Creates a new function block snippet
-    /// * snippet_name - the snippet name id
+    /// * name - the snippet name id
     /// * name - the block name
-    pub fn function_block<S>(snippet_name: S, name: S) -> Self
-    where S: Into<String>
-    {
-        let name = name.into();
-        
+    pub fn function_block<S>(name: S, block_name: &str) -> Self
+    where S: Into<String> {
         Self {
             language: "".into(),
-            name: snippet_name.into(),
-            description: format!("{name} ...() {}", "{ ... }"),
-            prefix: name.clone() + "() {}",
+            name: name.into(),
+            description: format!("{block_name} ...() {}", "{ ... }"),
+            prefix: block_name.to_owned() + "() {}",
             body: vec![
-                format!("{name} $1($2) {}", "{\n    $3\n}"),
+                format!("{block_name} $1($2) {}", "{\n    $3\n}"),
             ]
         }
     }
 
     /// Creates a new operator snippet without arguments
-    /// * snippet_name - the snippet name id
-    /// * name - the block name
-    pub fn operator<S>(snippet_name: S, name: S, value: Option<S>) -> Self
-    where S: Into<String>
-    {
-        let name = name.into();
-        let value = value.map(|s| s.into());
-        
+    /// * name - the snippet name id
+    /// * oper_name - the operator name
+    pub fn operator<S>(name: S, oper_name: &str, value: Option<&str>) -> Self
+    where S: Into<String> {
         Self {
             language: "".into(),
-            name: snippet_name.into(),
-            description: if value.is_some() { format!("{name} ...;") }else{ format!("{name};") },
-            prefix: if value.is_some() { format!("{name} ") }else{ format!("{name}") },
+            name: name.into(),
+            description: if value.is_some() { format!("{oper_name} ...;") }else{ format!("{oper_name};") },
+            prefix: if value.is_some() { format!("{oper_name} ") }else{ format!("{oper_name}") },
             body: vec![
-                if let Some(value) = value { format!("{name} ${}1:{value}{};", "{", "}") }else{ format!("{name};") },
+                if let Some(value) = value { format!("{oper_name} ${}1:{value}{};", "{", "}") }else{ format!("{oper_name};") },
             ]
         }
     }
 
     /// Creates a new function snippet
-    /// * snippet_name - the snippet name id
-    /// * name - the function name
-    pub fn function<S>(snippet_name: S, name: S, value: Option<S>) -> Self
-    where S: Into<String>
-    {
-        let name = name.into();
-        let value = value.map(|s| s.into());
-        
+    /// * name - the snippet name id
+    /// * fn_name - the function name
+    pub fn function<S>(name: S, fn_name: &str, value: Option<&str>) -> Self
+    where S: Into<String> {
         Self {
             language: "".into(),
-            name: snippet_name.into(),
-            description: format!("{name}({})", if value.is_some(){ "..." }else{ "" }),
-            prefix: name.clone() + "()",
+            name: name.into(),
+            description: format!("{fn_name}({})", if value.is_some(){ "..." }else{ "" }),
+            prefix: fn_name.to_owned() + "()",
             body: vec![
-                if let Some(value) = value { format!("{name}(${}1:{value}{})", "{", "}") }else{ format!("{name}()") },
+                if let Some(value) = value { format!("{fn_name}(${}1:{value}{})", "{", "}") }else{ format!("{fn_name}()") },
             ]
         }
     }
