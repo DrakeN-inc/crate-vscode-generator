@@ -148,16 +148,19 @@ fn main() -> Result<()> {
                 "Functions",
                 "The functions and methods snippets",
                 vec![
-                    Snippet::function("fn-read_to_string", "read_to_string", None),
-                    Snippet::function("fn-write_all", "write_all", None),
+                    Snippet::function("fn-read_to_string", "read_to_string", None, None),
+                    Snippet::function("fn-write_all", "write_all", None, None),
 
-                    Snippet::function("fn-unwrap", ".unwrap", None),
-                    Snippet::function("fn-unwrap_or", ".unwrap_or", Some("")),
-                    Snippet::function("fn-unwrap_or_else", ".unwrap_or_else", Some("")),
-                    Snippet::function("fn-map_err", ".map_err", Some("Error::from")),
+                    Snippet::function("fn-unwrap", ".unwrap", None, None),
+                    Snippet::function("fn-unwrap_or", ".unwrap_or", None, Some("")),
+                    Snippet::function("fn-unwrap_or_else", ".unwrap_or_else", None, Some("")),
+                    Snippet::function("fn-map_err", ".map_err", None, Some("Error::from")),
 
-                    Snippet::function("fn-new", "::new", None),
-                    Snippet::function("fn-from", "::from", None),
+                    Snippet::function("fn-new", "::new", None, Some("")),
+                    Snippet::function("fn-from", "::from", None, Some("")),
+
+                    Snippet::function("macro-vec", "vec!", Some(("[", "]")), Some("")),
+                    Snippet::function("macro-map", "map!", Some(("{", "}")), Some("")),
                 ]
             ),
         ],

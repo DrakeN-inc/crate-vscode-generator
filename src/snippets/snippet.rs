@@ -152,7 +152,7 @@ impl Snippet {
             language: "".into(),
             name: name.into(),
             description: format!("// {cmnt_name}: ..."),
-            prefix: format!("{cmnt_name}"),
+            prefix: format!("/{cmnt_name}"),
             body: vec![
                 format!("// {cmnt_name}: {}", "${1:...}")
             ]
@@ -168,9 +168,9 @@ impl Snippet {
             language: "".into(),
             name: name.into(),
             description: format!("#[{attr_name}{}]", if values.is_some(){ "(...)" }else{ "" }),
-            prefix: format!("#[{attr_name}]"),
+            prefix: format!("#[{attr_name}{}]", if values.is_some(){ "()" }else{ "" }),
             body: vec![
-                format!("#[{attr_name}{}]", if let Some(values) = values{ "(${1|".to_owned() + &values.join(",") + "|})" }else{ "".into() })
+                format!("#[{attr_name}{}]", if let Some(values) = values{ if !values.is_empty(){ "(${1|".to_owned() + &values.join(",") + "|})"}else{ "($1)".to_owned() } }else{ "".into() })
             ]
         }
     }
@@ -263,19 +263,22 @@ impl Snippet {
     /// Creates a new function snippet
     /// * name - the snippet name id
     /// * fn_name - the function name
-    pub fn function<S>(name: S, fn_name: &str, value: Option<&str>) -> Self
+    /// * pars - the non standart function parenthesis
+    pub fn function<S>(name: S, fn_name: &str, pars: Option<(&str, &str)>, value: Option<&str>) -> Self
     where S: Into<String> {
+        let (lpar, rpar) = if let Some(pars) = pars { pars }else{ ("(", ")") };
+        
         Self {
             language: "".into(),
             name: name.into(),
-            description: format!("{fn_name}({})", if value.is_some(){ "..." }else{ "" }),
-            prefix: fn_name.to_owned() + "()",
+            description: format!("{fn_name}{lpar}{}{rpar}", if value.is_some(){ "..." }else{ "" }),
+            prefix: fn_name.to_owned() + lpar + rpar,
             body: vec![
-                if let Some(value) = value { format!("{fn_name}(${}1:{value}{})", "{", "}") }else{ format!("{fn_name}()") },
+                if let Some(value) = value { format!("{fn_name}{lpar}${}1:{value}{}{rpar}", "{", "}") }else{ format!("{fn_name}{lpar}{rpar}") },
             ]
         }
     }
-    
+
     /// Converts the snippet to JSON string
     pub fn to_json(&self) -> Result<String> {
         serde_json::to_string_pretty(&self).map_err(Error::from)
